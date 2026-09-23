@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!-- UangKu Landing Page (refactored) — visual 100% sama dengan file asli.
+     Perubahan hanya organisasi: CSS -> css/styles.css, JS -> js/app.js.
+     Tidak ada class/id/teks/angka yang diubah. -->
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta content="#f7f4ea" name="theme-color" />
+  <meta content="UangKu membantu kamu memahami dampak keputusan finansial terhadap cashflow, dana likuid, dan target keuangan sebelum mengambil keputusan." name="description" />
+  <meta content="UangKu" name="application-name" />
+  <meta content="index,follow" name="robots" />
+  <meta content="website" property="og:type" />
+  <meta content="UangKu — Aplikasi Simulasi Keputusan Finansial" property="og:title" />
+  <meta content="UangKu membantu kamu memahami dampak keputusan finansial terhadap cashflow, dana likuid, dan target keuangan sebelum mengambil keputusan." property="og:description" />
+  <meta content="summary" name="twitter:card" />
+  <meta content="UangKu — Aplikasi Simulasi Keputusan Finansial" name="twitter:title" />
+  <meta content="UangKu membantu kamu memahami dampak keputusan finansial terhadap cashflow, dana likuid, dan target keuangan sebelum mengambil keputusan." name="twitter:description" />
+  <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport" />
+  <title>UangKu — Aplikasi Simulasi Keputusan Finansial</title>
+  <link href="data:image/png;base64,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" rel="icon"/>
+  <!-- Styles diekstrak ke css/styles.css (isi sama, sudah dibersihkan aman) -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body><a class="skip-link" href="#hero">Lewati ke konten utama</a>
+<header class="topbar">
+<a aria-label="UangKu — kembali ke halaman utama" class="brand" data-go="0" href="#hero"><img alt="" decoding="async" height="38" src="data:image/webp;base64,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" width="38"/><span>UangKu</span></a>
+<div class="top-actions">
+<button class="ghost-btn" data-go="3" type="button">Coba simulasi <span>↘</span></button>
+</div>
+</header>
+<nav aria-label="Navigasi bagian halaman" class="rail">
+<button aria-current="step" aria-label="Hero" class="rail-dot active" data-go="0" type="button"><span>01</span></button>
+<button aria-current="false" aria-label="Masalah" class="rail-dot" data-go="1" type="button"><span>02</span></button>
+<button aria-current="false" aria-label="Solusi" class="rail-dot" data-go="2" type="button"><span>03</span></button>
+<button aria-current="false" aria-label="Simulasi" class="rail-dot" data-go="3" type="button"><span>04</span></button>
+<button aria-current="false" aria-label="Cara kerja" class="rail-dot" data-go="4" type="button"><span>05</span></button>
+<button aria-current="false" aria-label="Penutup" class="rail-dot" data-go="5" type="button"><span>06</span></button>
+</nav><div aria-atomic="true" aria-live="polite" class="sr-only" id="slideStatus">Bagian 1 dari 6: Beranda</div>
+<main class="deck" id="deck">
+<!-- Slide 1/6 — Hero -->
+<section aria-labelledby="section-title-1" class="slide hero" data-label="Pembuka" id="hero">
+<div class="aurora a1"></div><div class="aurora a2"></div>
+<div class="slide-inner hero-grid">
+<div class="copy reveal-copy">
+<div class="eyebrow"><i></i> KEPUTUSAN LEBIH JELAS</div>
+<h1 id="section-title-1">Lihat dampaknya <em>sebelum</em> kamu memutuskan.</h1>
+<p>UangKu membantu kamu memahami bagaimana satu keputusan dapat mengubah cashflow, tabungan, dana darurat, dan target finansialmu.</p>
+<div class="actions">
+<button class="primary-btn" data-go="1" type="button">Kenapa UangKu dibuat <span>↓</span></button>
+</div>
+<div class="mini-points"><span>◉ Lihat dampak</span><span>▥ Bandingkan skenario</span><span>◇ Putuskan lebih sadar</span></div>
+</div>
+<div class="scene scene-hero" data-parallax="22">
+<div class="pedestal"></div>
+<div class="phone3d">
+<div class="phone-speaker"></div>
+<div class="app-screen">
+<div class="app-head"><div class="mini-logo"><img alt="" decoding="async" height="23" src="data:image/webp;base64,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" width="23"/><b>UangKu</b></div><span>•••</span></div>
+<div class="balance"><small>Total saldo</small><strong>Rp 12.450.000</strong><span>Keputusan hari ini membentuk masa depanmu.</span></div>
+<div class="quick"><i>+</i><i>↗</i><i>◎</i><i>◇</i></div>
+<div class="month"><small>Ringkasan bulan ini</small><div><span>Pemasukan</span><b>+8.500.000</b></div><div><span>Pengeluaran</span><b class="minus">−4.230.000</b></div><div><span>Sisa</span><b>+4.270.000</b></div></div>
+</div>
+</div>
+<div class="float-card fc1"><span class="cube">↗</span><div><small>Keputusan kecil</small><b>dampaknya besar</b></div></div>
+<div class="float-card fc2"><span class="cube">▥</span><div><small>Lihat</small><b>masa depannya</b></div></div>
+<div class="coin c1">Rp</div><div class="coin c2">Rp</div><div class="orb"></div>
+</div>
+</div>
+<div class="scroll-hint"><span>SCROLL</span><i></i></div>
+</section>
+<!-- Slide 2/6 — Problem -->
+<section aria-labelledby="section-title-2" class="slide problem" data-label="Masalah" id="problem">
+<div class="sun-glow"></div>
+<div class="slide-inner split">
+<div class="copy reveal-copy">
+<div class="eyebrow dark"><i></i> MASALAH YANG SERING TERJADI</div>
+<h2 id="section-title-2">Kita sering tahu <em>harganya</em>, tapi tidak tahu konsekuensinya.</h2>
+<p>Mampu membeli bukan selalu berarti keputusan itu aman untuk kondisi finansial secara keseluruhan.</p>
+<div class="problem-list">
+<article><b>01</b><div><h3>Fokus pada “bisa beli”</h3><p>Saldo cukup belum tentu aman.</p></div></article>
+<article><b>02</b><div><h3>Dampak tersebar</h3><p>Satu pembelian bisa mengubah banyak target.</p></div></article>
+<article><b>03</b><div><h3>Masa depan tidak terlihat</h3><p>Efeknya sering terasa belakangan.</p></div></article>
+</div>
+</div>
+<div class="scene sign-scene" data-parallax="18">
+<div class="road"></div>
+<div class="signpost">
+<div class="sign s1">BELI SEKARANG? <b>→</b></div>
+<div class="sign s2">TUNGGU DULU? <b>→</b></div>
+<div class="sign s3">APA DAMPAKNYA? <b>→</b></div>
+<div class="post"></div>
+</div>
+<div class="rock r1"></div><div class="rock r2"></div><div class="leaf l1"></div><div class="leaf l2"></div>
+</div>
+</div>
+</section>
+<!-- Slide 3/6 — Solution -->
+<section aria-labelledby="section-title-3" class="slide solution" data-label="Solusi" id="solution">
+<div class="aurora a3"></div>
+<div class="slide-inner split reverse-mobile">
+<div class="scene compare-scene" data-parallax="20">
+<div class="glass before-card">
+<small>SEBELUM</small><h3>Ruang finansial</h3>
+<div><span>Cashflow</span><b>+ Rp3,2 jt</b></div><div><span>Dana darurat</span><b>5,2 bulan</b></div><div><span>Target</span><b>On track</b></div>
+</div>
+<div class="arrow3d">→</div>
+<div class="glass after-card">
+<small>SETELAH KEPUTUSAN</small><h3>Dampak terlihat</h3>
+<div><span>Cashflow</span><b>+ Rp1,1 jt</b></div><div><span>Dana darurat</span><b>2,8 bulan</b></div><div><span>Target</span><b>+7 bulan</b></div>
+</div>
+<div class="ring"></div>
+</div>
+<div class="copy reveal-copy light-copy">
+<div class="eyebrow mint"><i></i> SOLUSI UANGKU</div>
+<h2 id="section-title-3">Bukan sekadar mencatat. <em>Pahami keputusanmu.</em></h2>
+<p>UangKu mengubah data finansial menjadi gambaran sebelum–sesudah yang mudah dipahami.</p>
+<div class="solution-points"><span><i>✓</i> Pahami kondisi sekarang</span><span><i>✓</i> Coba skenario tanpa mengubah data nyata</span><span><i>✓</i> Lihat trade-off sebelum memilih</span></div>
+</div>
+</div>
+</section>
+<!-- Slide 4/6 — Simulator -->
+<section aria-labelledby="simulatorTitle" class="slide simulator" data-label="Simulasi" id="simulator">
+<div class="slide-inner simulator-wrap">
+<div class="copy reveal-copy simulator-title">
+<h2 id="simulatorTitle">Satu keputusan. <em>Beberapa dampak.</em></h2>
+<p>Geser nilainya, pilih nominal cepat, lalu ubah metode pembayaran untuk melihat dampaknya.</p>
+</div>
+<div class="sim-stage" data-parallax="10">
+<div class="sim-card input-card">
+<div class="card-kicker">SIMULASI PEMBELIAN</div>
+<div class="purchase-row"><div><small>Rencana</small><strong>Laptop baru</strong></div><output aria-atomic="true" aria-live="off" id="priceOut">Rp 15.000.000</output></div>
+<div class="range-wrap"><span class="visually-hidden" id="priceHelp">Geser untuk memilih harga laptop dari 5 juta sampai 30 juta rupiah.</span>
+<input aria-describedby="priceHelp simDisclaimer" aria-label="Nominal pembelian laptop" aria-valuetext="Rp 15.000.000" id="price" inputmode="numeric" max="30000000" min="5000000" step="500000" type="range" value="15000000"/>
+<div class="range-scale"><span>5 jt</span><span>30 jt</span></div>
+</div>
+<div aria-label="Pilihan harga cepat" class="chips" role="group"><button aria-label="Pilih harga 7 jt" aria-pressed="false" data-price="7000000" type="button">7 jt</button><button aria-label="Pilih harga 15 jt" aria-pressed="true" class="chosen" data-price="15000000" type="button">15 jt</button><button aria-label="Pilih harga 25 jt" aria-pressed="false" data-price="25000000" type="button">25 jt</button></div>
+<label>Metode pembayaran
+              <select aria-describedby="simDisclaimer" aria-label="Metode pembayaran" id="method">
+<option value="cash">Tunai</option>
+<option value="bank">Online Banking</option>
+<option value="debit">Kartu Debit</option>
+<option value="ewallet">E-Wallet</option>
+<option value="credit3">Kartu Kredit — 3 bulan</option>
+<option value="install6">Cicilan — 6 bulan</option>
+<option value="install12">Cicilan — 12 bulan</option>
+</select>
+</label>
+<div class="small-note" id="simDisclaimer">Simulasi ilustratif untuk membantu membandingkan pilihan, bukan rekomendasi keuangan.</div>
+</div>
+<div class="sim-card impact-card">
+<div class="impact-heading">
+<div class="card-kicker">VISUAL DAMPAK</div>
+<h3>Dampak yang terlihat</h3>
+</div>
+<div aria-describedby="simA11y simDisclaimer" aria-label="Grafik dampak ilustratif. Cashflow, dana likuid, dan target dibandingkan sebelum dan sesudah keputusan." class="impact-chart" id="impactChart" role="img" tabindex="0">
+<div class="chart-legend"><span><i class="legend-before"></i>Sebelum</span><span><i class="legend-after"></i>Sesudah</span></div>
+<div class="chart-area">
+<div class="chart-guide g1"></div><div class="chart-guide g2"></div><div class="chart-guide g3"></div>
+<div class="metric-col">
+<div class="metric-bars"><i class="metric-before" style="height:92%"></i><i class="metric-after" data-metric="Cashflow sesudah" id="cashBar" role="presentation"></i></div>
+<b>Cashflow</b>
+</div>
+<div class="metric-col">
+<div class="metric-bars"><i class="metric-before" style="height:88%"></i><i class="metric-after" data-metric="Dana likuid sesudah" id="liquidBar" role="presentation"></i></div>
+<b>Dana likuid</b>
+</div>
+<div class="metric-col">
+<div class="metric-bars"><i class="metric-before" style="height:90%"></i><i class="metric-after" data-metric="Target sesudah" id="goalBar" role="presentation"></i></div>
+<b>Target</b>
+</div>
+</div>
+</div>
+<div aria-atomic="true" aria-live="polite" class="visually-hidden" id="simA11y">Harga 15 juta rupiah, metode Tunai. Grafik diperbarui.</div></div>
+<div class="laptop"><div class="lid"><div class="screen-glow"></div></div><div class="base"></div></div>
+</div>
+</div>
+</section>
+<!-- Slide 5/6 — Steps -->
+<section aria-labelledby="section-title-5" class="slide steps" data-label="Cara kerja" id="steps">
+<div class="slide-inner centered">
+<div class="copy reveal-copy center-copy">
+<div class="eyebrow dark"><i></i> CARA KERJA</div>
+<h2 id="section-title-5">Tiga langkah untuk keputusan yang lebih terinformasi.</h2>
+</div>
+<div class="steps-grid">
+<article class="step-card s-card-1"><span>1</span><div class="icon3d">▦</div><h3>Bangun gambaran finansialmu</h3><p>Masukkan kondisi dan tujuan finansialmu.</p></article>
+<article class="step-card s-card-2"><span>2</span><div class="icon3d">↔</div><h3>Simulasikan keputusan</h3><p>Uji keputusan dalam beberapa skenario.</p></article>
+<article class="step-card s-card-3"><span>3</span><div class="icon3d">✓</div><h3>Bandingkan dampaknya</h3><p>Lihat perubahan indikator sebelum memilih.</p></article>
+</div>
+</div>
+</section>
+<!-- Slide 6/6 — Finale + footer -->
+<section aria-labelledby="section-title-6" class="slide finale" data-label="Penutup" id="finale">
+<div class="aurora a4"></div>
+<div class="slide-inner final-grid">
+<div class="final-scene" data-parallax="24">
+<div class="bars"><i></i><i></i><i></i><i></i><i></i></div>
+<div class="gold-coin">Rp</div><div class="up-arrow">↗</div>
+</div>
+<div class="copy reveal-copy light-copy">
+<div class="project-kicker">PROYEK • NEXT LEVEL</div><div class="eyebrow mint"><i></i> UANGKU</div>
+<h2 id="section-title-6">Keputusan finansial tidak harus terasa seperti tebakan.</h2>
+<p>Lihat kondisimu, coba skenarionya, pahami dampaknya—lalu ambil keputusan dengan gambaran yang lebih lengkap.</p>
+<div class="actions"><button aria-controls="downloadSheet" aria-haspopup="dialog" class="white-btn" id="openDownload" type="button">Download UangKu <span>↓</span></button><button aria-label="Kembali ke bagian simulasi" class="outline-btn" data-go="3" type="button">Coba simulasi lagi</button></div>
+<div class="final-download-hint"><span aria-hidden="true">↓</span> Lanjutkan pengalaman lengkap di aplikasi UangKu</div>
+</div>
+</div>
+<footer aria-label="Informasi proyek dan tim" class="project-footer"><div class="project-footer__identity"><strong class="project-footer__title">UangKu — Aplikasi Simulasi Keputusan Finansial</strong><span class="project-footer__team">Tim <b>Next Level</b></span></div><div aria-label="Anggota tim" class="project-footer__members"><span>Jolene Agatha Angsana</span><span>Jasmins Runabella Chan</span><span>Olivia Lim</span><span>Frederich Louis</span></div></footer>
+</section>
+</main>
+<div aria-hidden="true" class="download-sheet" id="downloadSheet">
+<button aria-label="Tutup pilihan instal" class="download-backdrop" id="closeDownloadBackdrop" tabindex="-1" type="button"></button>
+<section aria-describedby="downloadDescription" aria-labelledby="downloadTitle" aria-modal="true" class="download-card" role="dialog" tabindex="-1">
+<button aria-label="Tutup" class="download-close" id="closeDownload" type="button">×</button>
+<div class="download-icon">↗</div>
+<span class="download-kicker">LANJUTKAN DI APLIKASI</span>
+<h3 id="downloadTitle">Install UangKu</h3>
+<p id="downloadDescription">Gunakan aplikasi untuk menyimpan kondisi finansialmu dan mencoba lebih banyak skenario.</p>
+<button class="install-device" id="installDevice" type="button">Install di perangkat <span>↓</span></button>
+<div class="store-grid">
+<a aria-label="Cari UangKu di Google Play, buka tab baru" href="https://play.google.com/store/search?q=UangKu&amp;c=apps" rel="noopener" target="_blank"><small>ANDROID</small><b>Cari di Play Store</b></a>
+<a aria-label="Cari UangKu di App Store, buka tab baru" href="https://apps.apple.com/us/search?term=UangKu" rel="noopener" target="_blank"><small>IOS</small><b>Cari di App Store</b></a>
+</div>
+<div aria-atomic="true" aria-live="polite" class="install-status" id="installStatus" role="status">Jika versi aplikasi belum dipublikasikan, tombol store akan membuka pencarian “UangKu”.</div>
+</section>
+</div>
+  <!-- App diekstrak ke js/app.js (logika sama persis) -->
+  <script src="js/app.js" defer></script>
+
+</body>
+</html>
