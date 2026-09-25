@@ -31,6 +31,7 @@ function setActive(index) {
   });
 
   const isDark = current === 2 || current === 5;
+  document.body.classList.toggle('nav-on-dark', isDark);
   if (isMobileNav()) {
     document.body.classList.toggle('mobile-dark-section', isDark);
   } else {
@@ -212,6 +213,8 @@ window.addEventListener('pointerleave', () => {
 // Simulator
 const price = document.getElementById('price');
 const priceOut = document.getElementById('priceOut');
+const income = document.getElementById('income');
+const incomeOut = document.getElementById('incomeOut');
 const method = document.getElementById('method');
 const cashBar = document.getElementById('cashBar');
 const liquidBar = document.getElementById('liquidBar');
@@ -242,24 +245,29 @@ const qualitative = n => n >= 76 ? 'relatif kuat' : n >= 56 ? 'cukup terjaga' : 
 
 function updateSim({ announce = false } = {}) {
   const p = Number(price.value);
+  const monthlyIncome = Number(income.value);
   const profile = methodProfile[method.value] || methodProfile.cash;
   priceOut.textContent = rupiah(p);
+  incomeOut.textContent = rupiah(monthlyIncome);
   price.setAttribute('aria-valuetext', `${rupiah(p)}, ${profile.label}`);
+  income.setAttribute('aria-valuetext', `${rupiah(monthlyIncome)} per bulan`);
 
-  const ratio = clamp(p / 30000000, .12, 1);
+  const priceRatio = clamp(p / 30000000, .12, 1);
+  const incomeRatio = clamp(monthlyIncome / 8000000, .38, 1.88);
+  const affordability = clamp((p / profile.months) / monthlyIncome, .05, 2.5);
   let cashScore, liquidScore, goalScore;
   if (profile.months === 1) {
     const feeDrag = typeof profile.fee === 'number' && profile.fee < 1 ? profile.fee * 180 : 0;
-    cashScore = 94 - ratio * 70 - feeDrag;
-    liquidScore = 90 - ratio * 77 - feeDrag * .4;
-    goalScore = 92 - ratio * 58;
+    cashScore = 94 - affordability * 56 - feeDrag + (incomeRatio - 1) * 9;
+    liquidScore = 90 - priceRatio * 72 - feeDrag * .4 + (incomeRatio - 1) * 15;
+    goalScore = 92 - priceRatio * 56 + (incomeRatio - 1) * 12;
   } else {
     const total = p * (1 + profile.fee);
     const monthly = total / profile.months;
-    const burden = clamp(monthly / 5000000, .08, 1);
-    cashScore = 94 - burden * 58;
-    liquidScore = 90 * profile.reserve - ratio * 8;
-    goalScore = 92 - burden * 42 - profile.fee * 90;
+    const burden = clamp(monthly / monthlyIncome, .08, 1.5);
+    cashScore = 94 - burden * 54 + (incomeRatio - 1) * 7;
+    liquidScore = 90 * profile.reserve - priceRatio * 8 + (incomeRatio - 1) * 12;
+    goalScore = 92 - burden * 40 - profile.fee * 90 + (incomeRatio - 1) * 10;
   }
 
   setScoreBar(cashBar, cashScore);
@@ -269,6 +277,8 @@ function updateSim({ announce = false } = {}) {
   const min = Number(price.min), max = Number(price.max);
   const fill = ((p - min) / (max - min)) * 100;
   price.style.setProperty('--range-fill', `${fill}%`);
+  const incomeFill = ((monthlyIncome - Number(income.min)) / (Number(income.max) - Number(income.min))) * 100;
+  income.style.setProperty('--range-fill', `${incomeFill}%`);
 
   priceButtons.forEach(b => {
     const selected = Number(b.dataset.price) === p;
@@ -276,7 +286,7 @@ function updateSim({ announce = false } = {}) {
     b.setAttribute('aria-pressed', selected ? 'true' : 'false');
   });
 
-  const summary = `${rupiah(p)}, metode ${profile.label}. Cashflow ${qualitative(cashScore)}, dana likuid ${qualitative(liquidScore)}, dan target ${qualitative(goalScore)}.`;
+  const summary = `Pendapatan ${rupiah(monthlyIncome)} per bulan, pembelian ${rupiah(p)}, metode ${profile.label}. Cashflow ${qualitative(cashScore)}, dana likuid ${qualitative(liquidScore)}, dan target ${qualitative(goalScore)}.`;
   impactChart.setAttribute('aria-label', `Grafik dampak ilustratif. ${summary}`);
   if (announce && simA11y) {
     clearTimeout(simAnnounceTimer);
@@ -293,6 +303,14 @@ price.addEventListener('input', () => {
   });
 });
 price.addEventListener('change', () => updateSim({ announce: true }));
+income.addEventListener('input', () => {
+  if (simFrame) return;
+  simFrame = requestAnimationFrame(() => {
+    simFrame = 0;
+    updateSim();
+  });
+});
+income.addEventListener('change', () => updateSim({ announce: true }));
 method.addEventListener('change', () => updateSim({ announce: true }));
 priceButtons.forEach(b => b.addEventListener('click', () => {
   price.value = b.dataset.price;
@@ -305,6 +323,7 @@ priceButtons.forEach(b => b.addEventListener('click', () => {
 const beginRangeDrag = () => deck.classList.add('sim-dragging');
 const endRangeDrag = () => deck.classList.remove('sim-dragging');
 price.addEventListener('pointerdown', beginRangeDrag);
+income.addEventListener('pointerdown', beginRangeDrag);
 window.addEventListener('pointerup', endRangeDrag, { passive: true });
 window.addEventListener('pointercancel', endRangeDrag, { passive: true });
 

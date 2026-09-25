@@ -343,3 +343,155 @@
     backdrop-filter: none;
   }
 }
+
+/* Footer copied from main: placement, visual treatment, and compact-screen behavior. */
+.project-footer{
+  position:absolute;z-index:8;left:50%;bottom:14px;transform:translateX(-50%);
+  width:min(1180px,calc(100% - 72px));display:flex;align-items:flex-end;
+  justify-content:space-between;gap:28px;padding:13px 16px;
+  border:1px solid rgba(255,255,255,.11);border-radius:16px;
+  background:rgba(3,39,31,.68);color:#dff7ee;box-shadow:0 12px 34px rgba(0,0,0,.12);
+}
+.project-footer__identity{display:grid;gap:4px;min-width:0}
+.project-footer__title{color:#fff;font-size:11px;line-height:1.2;letter-spacing:-.01em}
+.project-footer__team{color:#9fdcc8;font-size:9px;line-height:1.2}
+.project-footer__team b{color:#67e3b9}
+.project-footer__members{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px 12px;max-width:58%;color:#c8ded6;font-size:8.5px;line-height:1.25}
+.project-footer__members span{position:relative}
+.project-footer__members span:not(:last-child)::after{content:"•";position:absolute;right:-8px;color:#4dbb98}
+#finale .final-grid{padding-bottom:76px}
+
+@media (max-width:900px), (pointer:coarse){
+  .project-kicker{margin-bottom:7px;padding:6px 8px;font-size:7.5px}
+  .project-footer{bottom:max(6px,env(safe-area-inset-bottom));width:calc(100% - 24px);display:grid;grid-template-columns:1fr;gap:6px;padding:8px 10px;border-radius:13px;background:rgba(3,39,31,.88)}
+  .project-footer__identity{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .project-footer__title{font-size:8px;max-width:72%}
+  .project-footer__team{flex:0 0 auto;font-size:7.5px}
+  .project-footer__members{max-width:none;justify-content:flex-start;gap:3px 10px;font-size:7px}
+  .project-footer__members span:not(:last-child)::after{right:-6px}
+  #finale .final-grid{padding-bottom:88px}
+}
+
+@media (max-width:560px) and (max-height:760px){
+  .project-kicker{display:none}
+  .project-footer{gap:4px;padding:6px 8px}
+  .project-footer__title{font-size:7px}
+  .project-footer__team{font-size:6.8px}
+  .project-footer__members{font-size:6.2px;line-height:1.15}
+  #finale .final-grid{padding-bottom:82px}
+}
+
+/* Simulator income control, navigation contrast, and footer containment. */
+.income-control{margin-top:16px}
+.income-row{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#71827c;font-size:12px;font-weight:800}
+.income-row output{color:#07815f;font-size:14px;font-weight:900}
+.income-control input[type=range]{margin:10px 0 6px}
+
+.topbar{
+  background:linear-gradient(to bottom,rgba(255,253,247,.96),rgba(255,253,247,.78),rgba(255,253,247,0));
+  transition:background .22s ease,color .22s ease;
+}
+.nav-on-dark .topbar{background:linear-gradient(to bottom,rgba(3,39,31,.96),rgba(3,39,31,.76),rgba(3,39,31,0));color:#fff}
+.nav-on-dark .brand{color:#fff;text-shadow:0 1px 12px rgba(0,0,0,.25)}
+
+@media (max-width:900px){
+  .income-control{margin-top:12px}
+  .income-row{font-size:.92rem}
+  .income-row output{font-size:1rem}
+  #finale .project-footer{
+    position:relative;left:auto;bottom:auto;transform:none;
+    width:calc(100% - 48px);margin:0 24px max(24px,env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width:700px){
+  .topbar,.nav-on-dark .topbar{background:linear-gradient(to bottom,rgba(255,253,247,.98),rgba(255,253,247,.9),rgba(255,253,247,0))}
+  .nav-on-dark .topbar{background:linear-gradient(to bottom,rgba(3,39,31,.98),rgba(3,39,31,.9),rgba(3,39,31,0))}
+  .income-control{margin-top:14px}
+  .income-row{font-size:.86rem}
+  .income-row output{font-size:.9rem}
+  .income-control input[type=range]{margin-top:9px}
+  #finale .project-footer{width:calc(100% - 40px);margin-right:20px;margin-left:20px}
+}
+
+/* Responsive QA pass: preserve hierarchy and usable controls at each viewport. */
+.sim-card{min-width:0}
+.range-wrap{margin-top:16px}
+.income-control + .range-wrap{margin-top:18px}
+input[type=range]{min-height:30px;touch-action:pan-x}
+.chips button,.sim-card select{min-height:44px}
+.project-footer__members{overflow-wrap:anywhere}
+
+@media (min-width:701px) and (max-width:1100px){
+  :root{--gutter:clamp(40px,6vw,64px)}
+  .topbar{height:82px;padding-inline:max(28px,calc((100vw - var(--page))/2))}
+  .brand{font-size:1.18rem}
+  .brand img{width:46px;height:46px;border-radius:14px}
+  .hero-grid,.split,.solution .split,.final-grid{gap:clamp(24px,4vw,42px)}
+  .scene-hero,.sign-scene{height:clamp(470px,58vh,570px)}
+  .compare-scene{height:clamp(450px,56vh,550px)}
+  .simulator-wrap{padding-top:92px;padding-bottom:50px}
+  .simulator-title h2{font-size:clamp(42px,6vw,58px)}
+  .sim-stage{gap:14px;max-width:860px}
+  .sim-card{padding:22px}
+  .impact-heading h3{font-size:clamp(29px,4vw,36px)}
+  .project-footer{width:min(940px,calc(100% - 48px))}
+}
+
+@media (min-width:701px) and (max-width:900px) and (orientation:portrait){
+  .rail{display:none}
+  .top-actions{display:none}
+  .slide-inner{width:min(100% - 72px,760px)}
+  .hero-grid,.split,.solution .split,.final-grid{gap:24px}
+  .problem-list article{padding:11px 12px}
+  .problem-list h3{font-size:14px}
+  .sim-card{padding:18px}
+  .sim-card .chips button{padding-inline:7px;font-size:11px}
+  .income-row{font-size:11px}
+  .income-row output{font-size:12px}
+}
+
+@media (max-width:700px){
+  .sim-card{padding:20px}
+  .income-control + .range-wrap{margin-top:16px}
+  .range-wrap{margin-top:14px}
+  .income-row{font-size:.94rem}
+  .income-row output{font-size:1rem}
+  .chips{gap:8px}
+  .chips button{font-size:.88rem}
+  .sim-card select{font-size:.95rem}
+  .topbar{min-height:68px;padding-top:max(0px,env(safe-area-inset-top))}
+}
+
+@media (max-width:420px){
+  .slide-inner{width:calc(100% - 32px)}
+  h1{font-size:clamp(2.35rem,11.5vw,3rem)}
+  h2{font-size:clamp(1.95rem,9.5vw,2.45rem)}
+  .sim-card{padding:17px}
+  .chips button{font-size:.8rem}
+  .project-footer__identity{align-items:flex-start;flex-direction:column}
+}
+
+/* Phone correction pass: one clear solution list, stable header, and no exposed page edge. */
+@media (max-width:700px){
+  .solution-points{grid-template-columns:1fr;gap:10px}
+  .solution-points span,
+  .solution-points span:last-child{grid-column:auto;min-height:44px;padding:8px 10px}
+
+  .topbar,
+  .nav-on-dark .topbar{
+    height:68px;
+    padding-top:max(0px,env(safe-area-inset-top));
+    background:rgba(255,253,247,.98);
+    border-bottom:1px solid rgba(8,44,37,.1);
+    box-shadow:0 8px 22px rgba(4,54,41,.08);
+    backdrop-filter:none;
+  }
+  .topbar .brand{color:var(--ink);font-size:1rem}
+  .nav-on-dark .topbar .brand{color:var(--ink);text-shadow:none}
+
+  html,body,.deck{background:var(--deep2)}
+  .finale{display:block;min-height:100svh;padding-bottom:max(24px,env(safe-area-inset-bottom));overflow:visible}
+  .finale .slide-inner{padding-bottom:32px}
+  #finale .project-footer{margin-bottom:0}
+}

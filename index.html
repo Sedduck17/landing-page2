@@ -132,6 +132,12 @@
 <div class="sim-card input-card">
 <div class="card-kicker">SIMULASI PEMBELIAN</div>
 <div class="purchase-row"><div><small>Rencana</small><strong>Laptop baru</strong></div><output aria-atomic="true" aria-live="off" id="priceOut">Rp 15.000.000</output></div>
+<div class="income-control">
+<div class="income-row"><span>Pendapatan per bulan</span><output aria-live="off" id="incomeOut">Rp 8.000.000</output></div>
+<span class="visually-hidden" id="incomeHelp">Geser untuk memilih simulasi pendapatan bulanan dari 3 juta sampai 15 juta rupiah.</span>
+<input aria-describedby="incomeHelp simDisclaimer" aria-label="Simulasi pendapatan per bulan" aria-valuetext="Rp 8.000.000 per bulan" id="income" inputmode="numeric" max="15000000" min="3000000" step="500000" type="range" value="8000000"/>
+<div class="range-scale"><span>3 jt</span><span>15 jt</span></div>
+</div>
 <div class="range-wrap"><span class="visually-hidden" id="priceHelp">Geser untuk memilih harga laptop dari 5 juta sampai 30 juta rupiah.</span>
 <input aria-describedby="priceHelp simDisclaimer" aria-label="Nominal pembelian laptop" aria-valuetext="Rp 15.000.000" id="price" inputmode="numeric" max="30000000" min="5000000" step="500000" type="range" value="15000000"/>
 <div class="range-scale"><span>5 jt</span><span>30 jt</span></div>
@@ -173,7 +179,7 @@
 </div>
 </div>
 </div>
-<div aria-atomic="true" aria-live="polite" class="visually-hidden" id="simA11y">Harga 15 juta rupiah, metode Tunai. Grafik diperbarui.</div></div>
+<div aria-atomic="true" aria-live="polite" class="visually-hidden" id="simA11y">Pendapatan 8 juta rupiah per bulan, pembelian 15 juta rupiah, metode Tunai. Grafik diperbarui.</div></div>
 <div class="laptop"><div class="lid"><div class="screen-glow"></div></div><div class="base"></div></div>
 <img alt="Ilustrasi laptop dengan dashboard finansial" class="laptop-image" src="assets/simulator-laptop.png" />
 </div>
