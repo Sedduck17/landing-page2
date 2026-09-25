@@ -17,11 +17,6 @@ const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 let current = 0;
 let locked = false;
 let wheelCarry = 0;
-let touchStartY = null;
-let touchStartX = null;
-let touchpadGestureActive = false;
-let touchpadGestureTimer = null;
-let phoneSwipeLocked = false;
 
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 const isMobileNav = () => matchMedia('(max-width: 900px)').matches || matchMedia('(pointer: coarse)').matches;
@@ -38,11 +33,8 @@ function setActive(index) {
     d.setAttribute('aria-current', active ? 'step' : 'false');
   });
 
-  // Adaptive isDark: HP ikut phone-mobile (hero terang, tanpa dark),
-  // tablet ikut tablet-ipad (hero gelap perlu kontras).
-  const isDark = isPhoneLayout()
-    ? (current === 2 || current === 5)
-    : (current === 0 || current === 2 || current === 5);
+  const isDark = current === 2 || current === 5;
+  document.body.classList.toggle('nav-on-dark', isDark);
   if (isMobileNav()) {
     document.body.classList.toggle('mobile-dark-section', isDark);
   } else {
@@ -66,10 +58,7 @@ function setActive(index) {
 
 let wheelIdleTimer = null;
 let wheelLockRelease = null;
-// Precision touchpads emit much smaller deltas than a mouse wheel. Keep the
-// threshold low enough for a single two-finger gesture, while the lock below
-// still absorbs its remaining momentum so it cannot skip multiple sections.
-const WHEEL_THRESHOLD = 24;
+const WHEEL_THRESHOLD = 60;
 const WHEEL_IDLE_MS = 150;
 const WHEEL_SMOOTH_LOCK_MS = 600;
 const WHEEL_LOCK_EXTEND_MS = 120;
@@ -99,22 +88,10 @@ function goTo(index, behavior = 'smooth') {
   const next = clamp(index, 0, slides.length - 1);
   if (next === current && behavior === 'smooth') return;
 
-  // Tablet uses native scroll snapping for touch gestures. For button/dot jumps,
-  // use an immediate aligned scroll so it never fights Android's momentum scroll.
-  // HP (<=700px) dikecualikan: ikut phone-mobile via jalur terkunci di bawah.
-  if (isMobileNav() && !isPhoneLayout()) {
-    deck.scrollTo({
-      top: slides[next].offsetTop,
-      behavior: behavior === 'auto' ? 'auto' : 'smooth'
-    });
-    wheelCarry = 0;
-    return;
-  }
-
+  // Every device uses this one transition path. The phone touch handler below
+  // simply supplies the direction; it does not use a separate native scroll path.
   locked = true;
   wheelCarry = 0;
-  // OPSI-2: scroll dalam container deck saja (lebih andal dari scrollIntoView
-  // yang bisa mengincar window). Untuk REVERT: pakai scrollIntoView lagi.
   deck.scrollTo({ top: slides[next].offsetTop, behavior });
   setActive(next);
   scheduleUnlockAfterIdle(behavior === 'smooth' ? WHEEL_SMOOTH_LOCK_MS : 60);
@@ -158,31 +135,6 @@ window.addEventListener('wheel', (e) => {
   e.preventDefault();
   const d = dyRaw;
   if (Math.abs(d) < 2) return;
-
-  // A precision touchpad sends many events for one two-finger swipe. Treat the
-  // whole stream as one gesture so momentum cannot jump across several slides.
-  // Touchpads report pixel deltas (deltaMode 0), including fast swipes whose
-  // delta is larger than a single mouse-wheel notch.
-  if (e.deltaMode === 0) {
-    if (!touchpadGestureActive) {
-      const next = clamp(current + (d > 0 ? 1 : -1), 0, slides.length - 1);
-      if (next !== current) {
-        // A touchpad gesture already has a clear start/end. Jump directly to
-        // the next snap point so it cannot queue overlapping smooth-scroll
-        // animations when users scroll again quickly.
-        deck.scrollTo({ top: slides[next].offsetTop, behavior: 'auto' });
-        setActive(next);
-      }
-      touchpadGestureActive = true;
-    }
-    clearTimeout(touchpadGestureTimer);
-    touchpadGestureTimer = setTimeout(() => {
-      touchpadGestureActive = false;
-    }, 180);
-    wheelCarry = 0;
-    return;
-  }
-
   if (locked) {
     wheelCarry = 0;
     // Revisi trackpad: telan semua momentum selama lock agar 1 gesture = 1 slide.
@@ -205,51 +157,13 @@ window.addEventListener('wheel', (e) => {
   goTo(current + dir);
 }, { passive: false, capture: true });
 
-// Tablet touch navigation intentionally uses the browser's native momentum + CSS scroll snap.
-// Do not programmatically call goTo() on touchend there: doing both causes double movement/jank on Android.
-// HP (<=700px) port phone-mobile: satu usapan = satu slide via goTo terkunci (snap CSS sudah dimatikan).
-// Kontrol interaktif tetap pakai sentuhan normal.
-deck.addEventListener('touchstart', e => {
-  if (!isPhoneLayout() || e.touches.length !== 1 || isTouchControl(e.target)) return;
-  touchStartY = e.touches[0].clientY;
-  touchStartX = e.touches[0].clientX;
-}, { passive: true });
-
-deck.addEventListener('touchmove', e => {
-  if (!isPhoneLayout() || touchStartY === null || e.touches.length !== 1) return;
-  const deltaY = e.touches[0].clientY - touchStartY;
-  const deltaX = e.touches[0].clientX - touchStartX;
-  if (Math.abs(deltaY) > 12 && Math.abs(deltaY) > Math.abs(deltaX)) {
-    e.preventDefault();
-  }
-}, { passive: false });
-
-deck.addEventListener('touchend', e => {
-  if (!isPhoneLayout() || touchStartY === null || phoneSwipeLocked) {
-    touchStartY = null;
-    touchStartX = null;
-    return;
-  }
-  const touch = e.changedTouches[0];
-  const deltaY = touch.clientY - touchStartY;
-  const deltaX = touch.clientX - touchStartX;
-  touchStartY = null;
-  touchStartX = null;
-  if (Math.abs(deltaY) < 52 || Math.abs(deltaY) <= Math.abs(deltaX)) return;
-  phoneSwipeLocked = true;
-  goTo(current + (deltaY < 0 ? 1 : -1));
-  setTimeout(() => { phoneSwipeLocked = false; }, 600);
-}, { passive: true });
-
-deck.addEventListener('touchcancel', () => {
-  touchStartY = null;
-  touchStartX = null;
-}, { passive: true });
+// Phones intentionally use the browser's normal continuous scrolling.
+// There is no touch interception or forced slide transition here: a visitor
+// can stop anywhere in a section and scroll naturally through longer content.
 
 // Keyboard navigation.
 window.addEventListener('keydown', (e) => {
-  const active = document.activeElement;
-  if (active && active.closest('input, select, textarea, button, a, [contenteditable="true"]')) return;
+  if (['INPUT','SELECT'].includes(document.activeElement.tagName)) return;
   if (['ArrowDown','PageDown',' '].includes(e.key)) { e.preventDefault(); goTo(current + 1); }
   if (['ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); goTo(current - 1); }
   if (e.key === 'Home') goTo(0);
@@ -302,6 +216,8 @@ window.addEventListener('pointerleave', () => {
 // Simulator
 const price = document.getElementById('price');
 const priceOut = document.getElementById('priceOut');
+const income = document.getElementById('income');
+const incomeOut = document.getElementById('incomeOut');
 const method = document.getElementById('method');
 const cashBar = document.getElementById('cashBar');
 const liquidBar = document.getElementById('liquidBar');
@@ -332,24 +248,29 @@ const qualitative = n => n >= 76 ? 'relatif kuat' : n >= 56 ? 'cukup terjaga' : 
 
 function updateSim({ announce = false } = {}) {
   const p = Number(price.value);
+  const monthlyIncome = Number(income.value);
   const profile = methodProfile[method.value] || methodProfile.cash;
   priceOut.textContent = rupiah(p);
+  incomeOut.textContent = rupiah(monthlyIncome);
   price.setAttribute('aria-valuetext', `${rupiah(p)}, ${profile.label}`);
+  income.setAttribute('aria-valuetext', `${rupiah(monthlyIncome)} per bulan`);
 
-  const ratio = clamp(p / 30000000, .12, 1);
+  const priceRatio = clamp(p / 30000000, .12, 1);
+  const incomeRatio = clamp(monthlyIncome / 8000000, .38, 1.88);
+  const affordability = clamp((p / profile.months) / monthlyIncome, .05, 2.5);
   let cashScore, liquidScore, goalScore;
   if (profile.months === 1) {
     const feeDrag = typeof profile.fee === 'number' && profile.fee < 1 ? profile.fee * 180 : 0;
-    cashScore = 94 - ratio * 70 - feeDrag;
-    liquidScore = 90 - ratio * 77 - feeDrag * .4;
-    goalScore = 92 - ratio * 58;
+    cashScore = 94 - affordability * 56 - feeDrag + (incomeRatio - 1) * 9;
+    liquidScore = 90 - priceRatio * 72 - feeDrag * .4 + (incomeRatio - 1) * 15;
+    goalScore = 92 - priceRatio * 56 + (incomeRatio - 1) * 12;
   } else {
     const total = p * (1 + profile.fee);
     const monthly = total / profile.months;
-    const burden = clamp(monthly / 5000000, .08, 1);
-    cashScore = 94 - burden * 58;
-    liquidScore = 90 * profile.reserve - ratio * 8;
-    goalScore = 92 - burden * 42 - profile.fee * 90;
+    const burden = clamp(monthly / monthlyIncome, .08, 1.5);
+    cashScore = 94 - burden * 54 + (incomeRatio - 1) * 7;
+    liquidScore = 90 * profile.reserve - priceRatio * 8 + (incomeRatio - 1) * 12;
+    goalScore = 92 - burden * 40 - profile.fee * 90 + (incomeRatio - 1) * 10;
   }
 
   setScoreBar(cashBar, cashScore);
@@ -359,6 +280,8 @@ function updateSim({ announce = false } = {}) {
   const min = Number(price.min), max = Number(price.max);
   const fill = ((p - min) / (max - min)) * 100;
   price.style.setProperty('--range-fill', `${fill}%`);
+  const incomeFill = ((monthlyIncome - Number(income.min)) / (Number(income.max) - Number(income.min))) * 100;
+  income.style.setProperty('--range-fill', `${incomeFill}%`);
 
   priceButtons.forEach(b => {
     const selected = Number(b.dataset.price) === p;
@@ -366,7 +289,7 @@ function updateSim({ announce = false } = {}) {
     b.setAttribute('aria-pressed', selected ? 'true' : 'false');
   });
 
-  const summary = `${rupiah(p)}, metode ${profile.label}. Cashflow ${qualitative(cashScore)}, dana likuid ${qualitative(liquidScore)}, dan target ${qualitative(goalScore)}.`;
+  const summary = `Pendapatan ${rupiah(monthlyIncome)} per bulan, pembelian ${rupiah(p)}, metode ${profile.label}. Cashflow ${qualitative(cashScore)}, dana likuid ${qualitative(liquidScore)}, dan target ${qualitative(goalScore)}.`;
   impactChart.setAttribute('aria-label', `Grafik dampak ilustratif. ${summary}`);
   if (announce && simA11y) {
     clearTimeout(simAnnounceTimer);
@@ -383,6 +306,14 @@ price.addEventListener('input', () => {
   });
 });
 price.addEventListener('change', () => updateSim({ announce: true }));
+income.addEventListener('input', () => {
+  if (simFrame) return;
+  simFrame = requestAnimationFrame(() => {
+    simFrame = 0;
+    updateSim();
+  });
+});
+income.addEventListener('change', () => updateSim({ announce: true }));
 method.addEventListener('change', () => updateSim({ announce: true }));
 priceButtons.forEach(b => b.addEventListener('click', () => {
   price.value = b.dataset.price;
@@ -395,6 +326,7 @@ priceButtons.forEach(b => b.addEventListener('click', () => {
 const beginRangeDrag = () => deck.classList.add('sim-dragging');
 const endRangeDrag = () => deck.classList.remove('sim-dragging');
 price.addEventListener('pointerdown', beginRangeDrag);
+income.addEventListener('pointerdown', beginRangeDrag);
 window.addEventListener('pointerup', endRangeDrag, { passive: true });
 window.addEventListener('pointercancel', endRangeDrag, { passive: true });
 
