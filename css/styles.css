@@ -1464,3 +1464,80 @@ body.mobile-dark-section .topbar .brand{
 @media (max-width:1500px){
   .simulator .laptop{display:none!important;}
 }
+
+/* =========================================================
+   ADAPTIVE LAYOUT — gabungan phone-mobile + tablet-ipad (main only)
+   - Tablet/PC (>=701px): pakai visual 3D asli (tablet-ipad),
+     gambar raster disembunyikan.
+   - HP (<=700px): pakai gambar raster (phone-mobile),
+     scene 3D disembunyikan + konten dipaksa di tengah.
+   File branch phone-mobile & tablet-ipad TIDAK diubah.
+   ========================================================= */
+
+/* Nilai chart statis dipindah ke class (port dari phone-mobile). */
+.metric-before--cash{height:92%!important;}
+.metric-before--liquid{height:88%!important;}
+.metric-before--goal{height:90%!important;}
+
+/* Default desktop/tablet: gambar HP disembunyikan, scene 3D tampil. */
+.scene-image,
+.laptop-image{display:none!important;}
+
+/* HP: tampilkan gambar, sembunyikan scene 3D, paksa center. */
+@media (max-width:700px){
+  .scene-image{
+    display:block!important;
+    width:100%!important;
+    max-width:420px!important;
+    height:320px!important;
+    margin:0 auto!important;
+    object-fit:contain!important;
+    object-position:center center!important;
+    pointer-events:none!important;
+  }
+  .laptop-image{display:none!important;}
+
+  /* Sembunyikan semua anak 3D kecuali <img> agar tidak menumpuk / tidak off-center. */
+  .scene-hero > :not(.scene-image),
+  .sign-scene > :not(.scene-image),
+  .compare-scene > :not(.scene-image),
+  .final-scene > :not(.scene-image){display:none!important;}
+
+  /* Pastikan scene jadi wadah tengah yang rapi. */
+  .scene-hero,
+  .sign-scene,
+  .compare-scene,
+  .final-scene{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    margin:0 auto!important;
+    pointer-events:none!important;
+  }
+
+  /* Paksa copy/text di tengah HP (perbaikan keluhan "tidak bisa di tengah"). */
+  .hero .copy,
+  .problem .copy,
+  .solution .copy,
+  .simulator-title,
+  .center-copy,
+  .finale .copy{
+    text-align:center!important;
+    justify-items:center!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+  .hero .copy p,
+  .problem .copy > p,
+  .solution .copy > p,
+  .simulator-title p,
+  .finale .copy p{
+    margin-left:auto!important;
+    margin-right:auto!important;
+    text-align:center!important;
+  }
+  .hero .actions,
+  .finale .actions{justify-content:center!important;}
+  .mini-points{justify-content:center!important;}
+}
