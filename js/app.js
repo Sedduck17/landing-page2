@@ -17,9 +17,6 @@ const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 let current = 0;
 let locked = false;
 let wheelCarry = 0;
-let touchStartY = null;
-let touchStartX = null;
-let phoneSwipeLocked = false;
 
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 const isMobileNav = () => matchMedia('(max-width: 900px)').matches || matchMedia('(pointer: coarse)').matches;
@@ -156,47 +153,9 @@ window.addEventListener('wheel', (e) => {
   goTo(current + dir);
 }, { passive: false, capture: true });
 
-// Phone navigation uses the same one-gesture/one-slide rule as the desktop deck.
-// Interactive controls keep their normal touch behavior.
-const isPhoneLayout = () => matchMedia('(max-width: 700px)').matches;
-const isTouchControl = target => target?.closest?.('button,a,input,select,textarea,[contenteditable="true"]');
-
-deck.addEventListener('touchstart', e => {
-  if (!isPhoneLayout() || e.touches.length !== 1 || isTouchControl(e.target)) return;
-  touchStartY = e.touches[0].clientY;
-  touchStartX = e.touches[0].clientX;
-}, { passive: true });
-
-deck.addEventListener('touchmove', e => {
-  if (!isPhoneLayout() || touchStartY === null || e.touches.length !== 1) return;
-  const deltaY = e.touches[0].clientY - touchStartY;
-  const deltaX = e.touches[0].clientX - touchStartX;
-  if (Math.abs(deltaY) > 12 && Math.abs(deltaY) > Math.abs(deltaX)) {
-    e.preventDefault();
-  }
-}, { passive: false });
-
-deck.addEventListener('touchend', e => {
-  if (!isPhoneLayout() || touchStartY === null || phoneSwipeLocked) {
-    touchStartY = null;
-    touchStartX = null;
-    return;
-  }
-  const touch = e.changedTouches[0];
-  const deltaY = touch.clientY - touchStartY;
-  const deltaX = touch.clientX - touchStartX;
-  touchStartY = null;
-  touchStartX = null;
-  if (Math.abs(deltaY) < 52 || Math.abs(deltaY) <= Math.abs(deltaX)) return;
-  phoneSwipeLocked = true;
-  goTo(current + (deltaY < 0 ? 1 : -1));
-  setTimeout(() => { phoneSwipeLocked = false; }, 600);
-}, { passive: true });
-
-deck.addEventListener('touchcancel', () => {
-  touchStartY = null;
-  touchStartX = null;
-}, { passive: true });
+// Phones intentionally use the browser's normal continuous scrolling.
+// There is no touch interception or forced slide transition here: a visitor
+// can stop anywhere in a section and scroll naturally through longer content.
 
 // Keyboard navigation.
 window.addEventListener('keydown', (e) => {
