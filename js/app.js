@@ -21,9 +21,13 @@ let touchStartY = null;
 let touchStartX = null;
 let touchpadGestureActive = false;
 let touchpadGestureTimer = null;
+let phoneSwipeLocked = false;
 
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 const isMobileNav = () => matchMedia('(max-width: 900px)').matches || matchMedia('(pointer: coarse)').matches;
+// Port phone-mobile: HP (<=700px) ikut perilaku phone, tablet/PC ikut tablet-ipad.
+const isPhoneLayout = () => matchMedia('(max-width: 700px)').matches;
+const isTouchControl = target => target?.closest?.('button,a,input,select,textarea,[contenteditable="true"]');
 
 function setActive(index) {
   current = clamp(index, 0, slides.length - 1);
@@ -34,9 +38,11 @@ function setActive(index) {
     d.setAttribute('aria-current', active ? 'step' : 'false');
   });
 
-  // The mobile hero also uses a dark background, so the fixed wordmark needs
-  // the same high-contrast treatment as the solution and finale sections.
-  const isDark = current === 0 || current === 2 || current === 5;
+  // Adaptive isDark: HP ikut phone-mobile (hero terang, tanpa dark),
+  // tablet ikut tablet-ipad (hero gelap perlu kontras).
+  const isDark = isPhoneLayout()
+    ? (current === 2 || current === 5)
+    : (current === 0 || current === 2 || current === 5);
   if (isMobileNav()) {
     document.body.classList.toggle('mobile-dark-section', isDark);
   } else {
@@ -93,9 +99,10 @@ function goTo(index, behavior = 'smooth') {
   const next = clamp(index, 0, slides.length - 1);
   if (next === current && behavior === 'smooth') return;
 
-  // Mobile uses native scroll snapping for touch gestures. For button/dot jumps,
+  // Tablet uses native scroll snapping for touch gestures. For button/dot jumps,
   // use an immediate aligned scroll so it never fights Android's momentum scroll.
-  if (isMobileNav()) {
+  // HP (<=700px) dikecualikan: ikut phone-mobile via jalur terkunci di bawah.
+  if (isMobileNav() && !isPhoneLayout()) {
     deck.scrollTo({
       top: slides[next].offsetTop,
       behavior: behavior === 'auto' ? 'auto' : 'smooth'
@@ -198,8 +205,46 @@ window.addEventListener('wheel', (e) => {
   goTo(current + dir);
 }, { passive: false, capture: true });
 
-// Mobile touch navigation intentionally uses the browser's native momentum + CSS scroll snap.
-// Do not programmatically call goTo() on touchend: doing both causes double movement/jank on Android.
+// Tablet touch navigation intentionally uses the browser's native momentum + CSS scroll snap.
+// Do not programmatically call goTo() on touchend there: doing both causes double movement/jank on Android.
+// HP (<=700px) port phone-mobile: satu usapan = satu slide via goTo terkunci (snap CSS sudah dimatikan).
+// Kontrol interaktif tetap pakai sentuhan normal.
+deck.addEventListener('touchstart', e => {
+  if (!isPhoneLayout() || e.touches.length !== 1 || isTouchControl(e.target)) return;
+  touchStartY = e.touches[0].clientY;
+  touchStartX = e.touches[0].clientX;
+}, { passive: true });
+
+deck.addEventListener('touchmove', e => {
+  if (!isPhoneLayout() || touchStartY === null || e.touches.length !== 1) return;
+  const deltaY = e.touches[0].clientY - touchStartY;
+  const deltaX = e.touches[0].clientX - touchStartX;
+  if (Math.abs(deltaY) > 12 && Math.abs(deltaY) > Math.abs(deltaX)) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
+deck.addEventListener('touchend', e => {
+  if (!isPhoneLayout() || touchStartY === null || phoneSwipeLocked) {
+    touchStartY = null;
+    touchStartX = null;
+    return;
+  }
+  const touch = e.changedTouches[0];
+  const deltaY = touch.clientY - touchStartY;
+  const deltaX = touch.clientX - touchStartX;
+  touchStartY = null;
+  touchStartX = null;
+  if (Math.abs(deltaY) < 52 || Math.abs(deltaY) <= Math.abs(deltaX)) return;
+  phoneSwipeLocked = true;
+  goTo(current + (deltaY < 0 ? 1 : -1));
+  setTimeout(() => { phoneSwipeLocked = false; }, 600);
+}, { passive: true });
+
+deck.addEventListener('touchcancel', () => {
+  touchStartY = null;
+  touchStartX = null;
+}, { passive: true });
 
 // Keyboard navigation.
 window.addEventListener('keydown', (e) => {
