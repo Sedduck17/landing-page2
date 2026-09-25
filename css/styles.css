@@ -1463,4 +1463,3 @@ body.mobile-dark-section .topbar .brand{
    never competes with the simulator heading. */
 @media (max-width:1500px){
   .simulator .laptop{display:none!important;}
-}
